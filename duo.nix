@@ -9,48 +9,9 @@ let
   version = "5.10.4";
   src = "${duo-buildroot-sdk}/linux_${lib.versions.majorMinor version}";
 
-  extraconfig = pkgs.writeText "extraconfig" ''
-    CONFIG_CGROUPS=y
-    CONFIG_SYSFS=y
-    CONFIG_PROC_FS=y
-    CONFIG_FHANDLE=y
-    CONFIG_CRYPTO_USER_API_HASH=y
-    CONFIG_CRYPTO_HMAC=y
-    CONFIG_DMIID=y
-    CONFIG_AUTOFS_FS=y
-    CONFIG_TMPFS_POSIX_ACL=y
-    CONFIG_TMPFS_XATTR=y
-    CONFIG_SECCOMP=y
-    CONFIG_BLK_DEV_INITRD=y
-    CONFIG_BINFMT_ELF=y
-    CONFIG_INOTIFY_USER=y
-    CONFIG_CRYPTO_ZSTD=y
-    CONFIG_ZRAM=y
-    CONFIG_MAGIC_SYSRQ=y
-  '';
+  configfile = pkgs.writeText "milkv-duo-linux-config"
+    (builtins.readFile ./prebuilt/duo-kernel-config.txt);
 
-
-  defconfigfile = "./prebuilt/duo-kernel-config.txt";
-  #defconfigfile = pkgs.writeText "leigh-milkv-duo-linux-config"
-  #(builtins.readFile ./prebuilt/duo-kernel-config.txt);
-
-  # hack: drop duplicated entries
-  configfile = pkgs.runCommand "config" { } ''
-    # originally we took  from the buildroot sdk, but now we use a custom one.
-    # cp "''${duo-buildroot-sdk}/build/boards/cv180x/cv1800b_milkv_duo_sd/linux/cvitek_cv1800b_milkv_duo_sd_defconfig" "$out"
-    cp ${defconfigfile} "$out"
-
-    substituteInPlace "$out" \
-      --replace CONFIG_BLK_DEV_INITRD=y "" \
-      --replace CONFIG_DEBUG_FS=y       "" \
-      --replace CONFIG_VECTOR=y         "" \
-      --replace CONFIG_ZRAM=m           "" \
-      --replace CONFIG_SIGNALFD=n       CONFIG_SIGNALFD=y \
-      --replace CONFIG_TIMERFD=n        CONFIG_TIMERFD=y \
-      --replace CONFIG_EPOLL=n          CONFIG_EPOLL=y 
-
-    cat ${extraconfig} >> "$out"
-  '';
   kernel = (pkgs.linuxManualConfig {
     inherit version src configfile;
     allowImportFromDerivation = true;
