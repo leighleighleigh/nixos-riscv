@@ -8,6 +8,7 @@ let
   };
   version = "5.10.4";
   src = "${duo-buildroot-sdk}/linux_${lib.versions.majorMinor version}";
+
   extraconfig = pkgs.writeText "extraconfig" ''
     CONFIG_CGROUPS=y
     CONFIG_SYSFS=y
@@ -26,35 +27,19 @@ let
     CONFIG_CRYPTO_ZSTD=y
     CONFIG_ZRAM=y
     CONFIG_MAGIC_SYSRQ=y
-    # added by leigh
-    CONFIG_SWAP=y
-    CONFIG_CV1835_I2S_SUBSYS=y
-    CONFIG_USB=y
-    CONFIG_USB_STORAGE=y
-    CONFIG_USB_DWC2=y
-    CONFIG_USB_GADGET=y
-    CONFIG_USB_LIBCOMPOSITE=y
-    CONFIG_USB_F_ACM=y
-    CONFIG_USB_U_SERIAL=y
-    CONFIG_USB_U_ETHER=y
-    CONFIG_USB_U_AUDIO=y
-    CONFIG_USB_F_SERIAL=y
-    CONFIG_USB_F_ECM=y
-    CONFIG_USB_F_EEM=y
-    CONFIG_USB_F_RNDIS=y
-    CONFIG_USB_F_MASS_STORAGE=y
-    CONFIG_USB_F_FS=y
-    CONFIG_USB_F_UAC1=y
-    CONFIG_USB_F_UVC=y
-    CONFIG_USB_CONFIGFS=y
-    CONFIG_USB_CONFIGFS_SERIAL=y
-    CONFIG_USB_CONFIGFS_RNDIS=y
-    CONFIG_USB_CONFIGFS_ACM=y
-    CONFIG_USB_ROLE_SWITCH=y
   '';
+
+
+  defconfigfile = "./prebuilt/duo-kernel-config.txt";
+  #defconfigfile = pkgs.writeText "leigh-milkv-duo-linux-config"
+  #(builtins.readFile ./prebuilt/duo-kernel-config.txt);
+
   # hack: drop duplicated entries
   configfile = pkgs.runCommand "config" { } ''
-    cp "${duo-buildroot-sdk}/build/boards/cv180x/cv1800b_milkv_duo_sd/linux/cvitek_cv1800b_milkv_duo_sd_defconfig" "$out"
+    # originally we took  from the buildroot sdk, but now we use a custom one.
+    # cp "''${duo-buildroot-sdk}/build/boards/cv180x/cv1800b_milkv_duo_sd/linux/cvitek_cv1800b_milkv_duo_sd_defconfig" "$out"
+    cp ${defconfigfile} "$out"
+
     substituteInPlace "$out" \
       --replace CONFIG_BLK_DEV_INITRD=y "" \
       --replace CONFIG_DEBUG_FS=y       "" \
@@ -62,7 +47,8 @@ let
       --replace CONFIG_ZRAM=m           "" \
       --replace CONFIG_SIGNALFD=n       CONFIG_SIGNALFD=y \
       --replace CONFIG_TIMERFD=n        CONFIG_TIMERFD=y \
-      --replace CONFIG_EPOLL=n          CONFIG_EPOLL=y
+      --replace CONFIG_EPOLL=n          CONFIG_EPOLL=y 
+
     cat ${extraconfig} >> "$out"
   '';
   kernel = (pkgs.linuxManualConfig {
