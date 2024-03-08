@@ -179,12 +179,55 @@ in
 
   services.udev.enable = false;
   services.nscd.enable = false;
-  networking.firewall.enable = false;
-  networking.useDHCP = false;
+  #networking.firewall.enable = false;
+  #networking.useDHCP = false;
   nix.enable = false;
   system.nssModules = lib.mkForce [ ];
 
-  environment.systemPackages = with pkgs; [ pfetch ];
+
+  networking = {
+    interfaces.usb0 = {
+      ipv4.addresses = [
+        {
+          address = "192.168.4.2";
+          prefixLength = 24;
+        }
+      ];
+    };
+    # dnsmasq reads /etc/resolv.conf to find 8.8.8.8 and 1.1.1.1
+    nameservers =  [ "127.0.0.1" "8.8.8.8" "1.1.1.1"];
+    useDHCP = false;
+    dhcpcd.enable = false;
+    defaultGateway = "192.168.58.1";
+    hostName = "nixos-duo";
+    firewall.enable = false;
+  };
+
+  # configure usb0 as an RNDIS device
+  systemd.tmpfiles.settings = {
+    "10-cviusb" = {
+      "/proc/cviusb/otg_role".w.argument = "device";
+    };
+  };
+
+  services.dnsmasq.enable = true;
+
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = true;
+      PermitRootLogin = "yes";
+    };
+  };
+
+  # generating the host key takes a while
+  systemd.services.sshd.serviceConfig ={
+    TimeoutStartSec = 120;
+  };
+
+  environment.systemPackages = with pkgs; [
+    pfetch python311 usbutils inetutils iproute2 vim htop
+  ];
 
   sdImage = {
     firmwareSize = 64;
