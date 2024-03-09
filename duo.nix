@@ -203,7 +203,7 @@ in
   };
 
   environment.systemPackages = with pkgs; [
-    pfetch python311 usbutils inetutils iproute2 vim htop netscript ranger
+    pfetch python311 usbutils inetutils iproute2 vim htop netscript ranger neofetch lunarvim
   ];
 
   sdImage = {
