@@ -158,7 +158,11 @@ in
   services.nscd.enable = false;
   #networking.firewall.enable = false;
   #networking.useDHCP = false;
-  nix.enable = false;
+  
+  ########################## THIS WILL MAKE IT A PROPER NIXOS SYSTEM!
+  ########################## BY DEFAULT IT IS FALSE
+  nix.enable = true;
+
   system.nssModules = lib.mkForce [ ];
 
 
@@ -203,7 +207,7 @@ in
   };
 
   environment.systemPackages = with pkgs; [
-    pfetch (python311.withPackages(ps: with ps; [ numpy pip wheel setuptools])) usbutils inetutils iproute2 vim htop netscript ranger neofetch git gcc gnumake pkg-config glibc rustc cargo
+    pfetch (python311.withPackages(ps: with ps; [pip wheel setuptools])) usbutils inetutils iproute2 vim htop netscript ranger neofetch git gcc gnumake pkg-config
   ];
 
   sdImage = {
