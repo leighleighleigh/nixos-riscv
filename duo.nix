@@ -203,7 +203,7 @@ in
   };
 
   environment.systemPackages = with pkgs; [
-    pfetch python311 usbutils inetutils iproute2 vim htop netscript ranger neofetch 
+    pfetch (python311.withPackages(ps: with ps; [ numpy pip wheel setuptools])) usbutils inetutils iproute2 vim htop netscript ranger neofetch git gcc gnumake pkg-config glibc rustc cargo
   ];
 
   sdImage = {
