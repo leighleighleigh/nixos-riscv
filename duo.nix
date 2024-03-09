@@ -8,38 +8,15 @@ let
   };
   version = "5.10.4";
   src = "${duo-buildroot-sdk}/linux_${lib.versions.majorMinor version}";
-  extraconfig = pkgs.writeText "extraconfig" ''
-    CONFIG_CGROUPS=y
-    CONFIG_SYSFS=y
-    CONFIG_PROC_FS=y
-    CONFIG_FHANDLE=y
-    CONFIG_CRYPTO_USER_API_HASH=y
-    CONFIG_CRYPTO_HMAC=y
-    CONFIG_DMIID=y
-    CONFIG_AUTOFS_FS=y
-    CONFIG_TMPFS_POSIX_ACL=y
-    CONFIG_TMPFS_XATTR=y
-    CONFIG_SECCOMP=y
-    CONFIG_BLK_DEV_INITRD=y
-    CONFIG_BINFMT_ELF=y
-    CONFIG_INOTIFY_USER=y
-    CONFIG_CRYPTO_ZSTD=y
-    CONFIG_ZRAM=y
-    CONFIG_MAGIC_SYSRQ=y
+
+  configfile = pkgs.writeText "milkv-duo-linux-config"
+    (builtins.readFile ./prebuilt/duo-kernel-config.txt);
+
+  netscript = pkgs.writeShellScriptBin "setup-network" ''
+  #!/usr/bin/env bash
+  sudo ip r add default via 192.168.4.1 dev usb0
   '';
-  # hack: drop duplicated entries
-  configfile = pkgs.runCommand "config" { } ''
-    cp "${duo-buildroot-sdk}/build/boards/cv180x/cv1800b_milkv_duo_sd/linux/cvitek_cv1800b_milkv_duo_sd_defconfig" "$out"
-    substituteInPlace "$out" \
-      --replace CONFIG_BLK_DEV_INITRD=y "" \
-      --replace CONFIG_DEBUG_FS=y       "" \
-      --replace CONFIG_VECTOR=y         "" \
-      --replace CONFIG_ZRAM=m           "" \
-      --replace CONFIG_SIGNALFD=n       CONFIG_SIGNALFD=y \
-      --replace CONFIG_TIMERFD=n        CONFIG_TIMERFD=y \
-      --replace CONFIG_EPOLL=n          CONFIG_EPOLL=y
-    cat ${extraconfig} >> "$out"
-  '';
+    
   kernel = (pkgs.linuxManualConfig {
     inherit version src configfile;
     allowImportFromDerivation = true;
@@ -179,12 +156,55 @@ in
 
   services.udev.enable = false;
   services.nscd.enable = false;
-  networking.firewall.enable = false;
-  networking.useDHCP = false;
+  #networking.firewall.enable = false;
+  #networking.useDHCP = false;
   nix.enable = false;
   system.nssModules = lib.mkForce [ ];
 
-  environment.systemPackages = with pkgs; [ pfetch ];
+
+  networking = {
+    interfaces.usb0 = {
+      ipv4.addresses = [
+        {
+          address = "192.168.4.2";
+          prefixLength = 24;
+        }
+      ];
+    };
+    # dnsmasq reads /etc/resolv.conf to find 8.8.8.8 and 1.1.1.1
+    nameservers =  [ "127.0.0.1" "8.8.8.8" "1.1.1.1"];
+    useDHCP = false;
+    dhcpcd.enable = false;
+    defaultGateway = "192.168.58.1";
+    hostName = "nixos-duo";
+    firewall.enable = false;
+  };
+
+  # configure usb0 as an RNDIS device
+  systemd.tmpfiles.settings = {
+    "10-cviusb" = {
+      "/proc/cviusb/otg_role".w.argument = "device";
+    };
+  };
+
+  services.dnsmasq.enable = true;
+
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = true;
+      PermitRootLogin = "yes";
+    };
+  };
+
+  # generating the host key takes a while
+  systemd.services.sshd.serviceConfig ={
+    TimeoutStartSec = 120;
+  };
+
+  environment.systemPackages = with pkgs; [
+    pfetch python311 usbutils inetutils iproute2 vim htop netscript ranger neofetch 
+  ];
 
   sdImage = {
     firmwareSize = 64;
@@ -195,4 +215,5 @@ in
     '';
   };
 
+  swapDevices = [ { device = "/swap"; size = 1024; } ];
 }
