@@ -1,0 +1,15 @@
+# run with 'nft -f'
+# enp1s0 is my ethernet interface, connected to my Internet router.
+# enp0s20f0u7u2 is the RNDIS interface created by attaching the Duo to
+# the host via USB.
+
+table ip duo_table { chain duo_nat { type nat hook postrouting priority 0;
+       policy accept; oifname "enp5s0" masquerade
+       }
+
+      chain duo_forward {
+               type filter hook forward priority 0; policy accept;
+               iifname "enp12s0f3u4i1" oifname "enp5s0" accept
+       }
+}
+
