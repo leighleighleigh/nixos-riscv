@@ -12,6 +12,11 @@ let
   configfile = pkgs.writeText "milkv-duo-linux-config"
     (builtins.readFile ./prebuilt/duo-kernel-config.txt);
 
+  netscript = pkgs.writeShellScriptBin "setup-network" ''
+  #!/usr/bin/env bash
+  sudo ip r add default via 192.168.4.1 dev usb0
+  '';
+    
   kernel = (pkgs.linuxManualConfig {
     inherit version src configfile;
     allowImportFromDerivation = true;
@@ -198,7 +203,7 @@ in
   };
 
   environment.systemPackages = with pkgs; [
-    pfetch python311 usbutils inetutils iproute2 vim htop
+    pfetch python311 usbutils inetutils iproute2 vim htop netscript ranger
   ];
 
   sdImage = {
@@ -210,4 +215,5 @@ in
     '';
   };
 
+  swapDevices = [ { device = "/swap"; size = 1024; } ];
 }
