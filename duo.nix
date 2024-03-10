@@ -64,10 +64,13 @@ in
 
   boot.kernel.sysctl = {
     "vm.watermark_boost_factor" = 0;
-    "vm.watermark_scale_factor" = 125;
-    "vm.page-cluster" = 0;
-    "vm.swappiness" = 180;
+    "vm.watermark_scale_factor" = 250; # increase swap aggression in kswapd. max is 30%, or 300.
+    "vm.page-cluster" = 3; # increase swap pre-fetching. 0,1,2. logarithmic.
+    "vm.swappiness" = 200;
     "kernel.pid_max" = 4096 * 8; # PAGE_SIZE * 8
+    "vm.overcommit_memory" = 1; # 1 pretends we always have memory
+    #"vm.overcommit_ratio" = 80; 
+    "vm.vfs_cache_pressure" = 200; # reclaim cached dirs and inodes aggressively.
   };
 
   system.build.dtb = pkgs.runCommand "duo.dtb" { nativeBuildInputs = [ pkgs.dtc ]; } ''
@@ -220,5 +223,5 @@ in
     '';
   };
 
-  swapDevices = [ { device = "/swap"; size = 8192; } ];
+  swapDevices = [ { device = "/swap"; size = 2048; } ];
 }
