@@ -30,8 +30,6 @@ let
                   'KBUILD_AFLAGS += -march=$(riscv-march-aflags-y)_zicsr_zifencei'
     '';
   };
-
-  channel-update = pkgs.callPackage ./channels.nix {};
 in
 {
 
@@ -41,6 +39,7 @@ in
 
   imports = [
     "${modulesPath}/installer/sd-card/sd-image.nix"
+    ./channel.nix
   ];
 
   nixpkgs = {
@@ -210,7 +209,7 @@ in
 
   environment.systemPackages = with pkgs; [
     pfetch (python311.withPackages(ps: with ps; [pip wheel setuptools])) usbutils inetutils iproute2 vim htop netscript ranger neofetch git gcc gnumake pkg-config
-  ] ++ [ channel-update ];
+  ];
 
   sdImage = {
     firmwareSize = 64;
