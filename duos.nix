@@ -1,26 +1,20 @@
 { config, lib, pkgs, modulesPath, ... }:
 
-# The cv1812cp_milkv_duo256m_sd.dtb and fip-duo256.bin (aka fip.bin) files in
-# the prebuilt/ dir used by this module were generated on Ubuntu via "./build.sh
+# The cv1813hXXX_milkv_duos_sd.dtb and fip-duos.bin (aka fip.bin) files in
+# the prebuilt/ dir used by this module were generated on Debian via "./build.sh
 # lunch" within a fork of Milk V's duo-buildroot-sdk repo at
 # https://github.com/mcdonc/duo-buildroot-sdk/tree/nixos-riscv . The fork is
 # trivial: four lines were changed to allow dynamic kernel params to be passed
 # down to the kernel and to NixOS and to increase available RAM by changing
-# ION_SIZE.  The cv1812cp_milkv_duo256m_sd.dtc file in the prebuilt/ dir was
-# generated from the cv1812cp_milkv_duo256m_sd.dtb using
+# ION_SIZE.  The cv1813h_milkv_duos_sd.dtc file in the prebuilt/ dir was
+# generated from the cv1813h_milkv_duos_sd.dtb using
 
-# dtc -I dtb -O dts -o cv1812cp_milkv_duo256m_sd.dts \
-#    -@ linux_5.10/build/cv1812cp_milkv_duo256m_sd/arch/riscv/boot/dts/cvitek/cv1812cp_milkv_duo256m_sd.dtb
+# dtc -I dtb  -O dts -o cv1813h_milkv_duos_sd.dts  -@ ~/duo-buildroot-sdk/linux_5.10/build/cv1813h_milkv_duos_sd/arch/riscv/boot/dts/cvitek/cv1813h_milkv_duos_sd.dtb
 
-# The fip.bin file was taken from fsbl/build/cv1812cp_milkv_duo256m_sd/fip.bin
+
+# The fip.bin file was taken from fsbl/build/cv1813h_milkv_duos_sd/fip.bin
 #
-# The file prebuilt/duo-256-kernel-config.txt was created by hand by copying the
-# running kernel config from a buildroot-generated duo image and massaging it
-# such that it compiled and had proper support for userspace NixOS bits and
-# networking.  Note that, for whatever reason, ordering of configuration
-# settings *matters* in this file. If you change the ordering of the CONFIG
-# settings, you may get compile time errors.  Also, If comments about "is not
-# set" are removed it may not work properly.
+# The kernel config file was reused from duo256
 #
 # If stage 2 of the boot from SD fails to boot automatically, it can be booted
 # manually. via the U-Boot CLI:
@@ -106,10 +100,10 @@ in
     "kernel.pid_max" = 4096 * 8; # PAGE_SIZE * 8
   };
 
-  system.build.dtb = pkgs.runCommand "duo256m.dtb" {
+  system.build.dtb = pkgs.runCommand "duos.dtb" {
     nativeBuildInputs = [ pkgs.dtc ]; } ''
-    dtc -I dts -O dtb -o "$out" ${pkgs.writeText "duo256m.dts" ''
-      /include/ "${./prebuilt/cv1812cp_milkv_duo256m_sd.dts}"
+    dtc -I dts -O dtb -o "$out" ${pkgs.writeText "duos.dts" ''
+      /include/ "${./prebuilt/cv1813h_milkv_duos_sd.dts}"
       / {
         chosen {
           bootargs = "init=${config.system.build.toplevel}/init ${toString config.boot.kernelParams}";
@@ -164,8 +158,8 @@ in
       };
 
       configurations {
-        config-cv1812cp_milkv_duo256m_sd {
-          description = "boot cvitek system with board cv1812cp_milkv_duo256m";
+        config-cv1813h_milkv_duos_sd {
+          description = "boot cvitek system with board cv1812h_milkv_duos";
           kernel = "kernel-1";
           ramdisk = "ramdisk-1";
           fdt = "fdt-1";
@@ -247,7 +241,7 @@ in
     firmwareSize = 64;
     populateRootCommands = "";
     populateFirmwareCommands = ''
-      cp ${./prebuilt/fip-duo256.bin}  firmware/fip.bin
+      cp ${./prebuilt/fip-duos.bin}  firmware/fip.bin
       cp ${config.system.build.bootsd} firmware/boot.sd
     '';
   };

@@ -3,8 +3,8 @@ let
   duo-buildroot-sdk = pkgs.fetchFromGitHub {
     owner = "milkv-duo";
     repo = "duo-buildroot-sdk";
-    rev = "0e0b8efb59bf8b9664353323abbfdd11751056a4"; # 2024-02-14
-    hash = "sha256-tG4nVVXh1Aq6qeoy+J1LfgsW+J1Yx6KxfB1gjxprlXU=";
+    rev = "362832ac6632b4b6487d9a4046363371b62d727e"; # 2024-03-26
+    hash = "sha256-G+NC6p4frv89HA42T/hHefAKEBnaNC6Ln/RKdyJ//M4=";
   };
   version = "5.10.4";
   src = "${duo-buildroot-sdk}/linux_${lib.versions.majorMinor version}";
@@ -213,6 +213,8 @@ in
   environment.systemPackages = with pkgs; [
     pfetch (python311.withPackages(ps: with ps; [pip wheel setuptools])) usbutils inetutils iproute2 vim htop netscript ranger neofetch git gcc gnumake pkg-config
   ];
+
+  programs.less.lessopen = null;
 
   sdImage = {
     firmwareSize = 64;

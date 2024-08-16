@@ -5,8 +5,17 @@
     crossSystem.config = "riscv64-unknown-linux-gnu";
   };
 
-  virtualisation.docker.enable = true;
+  programs.less.lessopen = null;
+
+  services.openssh.enable = true;
 
   environment.systemPackages = with pkgs;[ neofetch iperf3 ];
+
+  nixpkgs.flake = {
+    setNixPath = false;
+    setFlakeRegistry = false;
+  };
+
+  system.installer.channel.enable = false;
 
 }

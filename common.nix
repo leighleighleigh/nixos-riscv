@@ -1,4 +1,5 @@
-{ config, modulesPath, ... }: {
+{ config, modulesPath, ... }:
+{
 
   imports = [
     "${modulesPath}/profiles/base.nix"
@@ -10,10 +11,17 @@
     crossSystem.config = "riscv64-unknown-linux-gnu";
   };
 
+  nixpkgs.flake = {
+    setNixPath = false;
+    setFlakeRegistry = false;
+  };
+
   boot.loader = {
     grub.enable = false;
     generic-extlinux-compatible.enable = true;
   };
+
+  programs.less.lessopen = null;
 
   sdImage = {
     populateFirmwareCommands = "";
