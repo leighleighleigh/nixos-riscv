@@ -66,6 +66,7 @@ in
 
   imports = [
     "${modulesPath}/installer/sd-card/sd-image.nix"
+    ./channel.nix
   ];
 
   nixpkgs = {
@@ -82,9 +83,9 @@ in
   ];
   boot.consoleLogLevel = 9;
 
-  boot.initrd.includeDefaultModules = false;
+  boot.initrd.includeDefaultModules = true;
   boot.initrd.systemd = {
-    # enable = true;
+    # enable = false;
     # enableTpm2 = false;
   };
 
@@ -188,7 +189,7 @@ in
 
   services.udev.enable = false;
   services.nscd.enable = false;
-  nix.enable = false;
+  nix.enable = true;
   system.nssModules = lib.mkForce [ ];
 
   networking = {
