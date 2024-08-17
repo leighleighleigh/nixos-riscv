@@ -83,7 +83,7 @@ in
   ];
   boot.consoleLogLevel = 9;
 
-  boot.initrd.includeDefaultModules = true;
+  boot.initrd.includeDefaultModules = false;
   boot.initrd.systemd = {
     # enable = false;
     # enableTpm2 = false;
