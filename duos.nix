@@ -76,7 +76,7 @@ in
 
   boot.kernelPackages = pkgs.linuxPackagesFor kernel;
 
-  boot.extraModulePackages = [ config.boot.kernelPackages.batman_adv ];
+  boot.extraModulePackages = [ ];
 
   boot.kernelParams = [
     "console=ttyS0,115200"
@@ -191,7 +191,7 @@ in
 
   services.udev.enable = false;
   services.nscd.enable = false;
-  nix.enable = false;
+  nix.enable = true;
   system.nssModules = lib.mkForce [ ];
 
   networking = {
@@ -235,7 +235,7 @@ in
   };
 
   environment.systemPackages = with pkgs; [
-    pfetch python311 usbutils inetutils iproute2 vim iw batctl wirelesstools dig
+    pfetch python311 usbutils inetutils iproute2 vim iw batctl wirelesstools dig git gnumake pkg-config gcc
   ];
 
   programs.less.lessopen = null;
