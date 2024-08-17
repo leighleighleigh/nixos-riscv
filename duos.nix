@@ -233,7 +233,7 @@ in
   };
 
   environment.systemPackages = with pkgs; [
-    pfetch python311 usbutils inetutils iproute2 vim
+    pfetch python311 usbutils inetutils iproute2 vim iw batctl wirelesstools dig
   ];
 
   programs.less.lessopen = null;
@@ -246,5 +246,7 @@ in
       cp ${config.system.build.bootsd} firmware/boot.sd
     '';
   };
+
+  swapDevices = [ { device = "/swap"; size = 2048; } ];
 
 }
