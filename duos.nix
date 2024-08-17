@@ -66,7 +66,7 @@ in
 
   imports = [
     "${modulesPath}/installer/sd-card/sd-image.nix"
-    ./channel.nix
+    #./channel.nix
   ];
 
   nixpkgs = {
@@ -75,6 +75,8 @@ in
   };
 
   boot.kernelPackages = pkgs.linuxPackagesFor kernel;
+
+  boot.extraModulePackages = [ config.boot.kernelPackages.batman_adv ];
 
   boot.kernelParams = [
     "console=ttyS0,115200"
@@ -189,7 +191,7 @@ in
 
   services.udev.enable = false;
   services.nscd.enable = false;
-  nix.enable = true;
+  nix.enable = false;
   system.nssModules = lib.mkForce [ ];
 
   networking = {
