@@ -235,7 +235,7 @@ in
   };
 
   environment.systemPackages = with pkgs; [
-    pfetch python311 usbutils inetutils iproute2 vim iw batctl wirelesstools dig git gnumake pkg-config gcc
+    pfetch python311 usbutils inetutils iproute2 vim iw batctl wirelesstools dig git gnumake pkg-config gcc wpa_supplicant
   ];
 
   programs.less.lessopen = null;
