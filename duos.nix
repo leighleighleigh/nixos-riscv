@@ -191,7 +191,7 @@ in
   users.users.root.initialPassword = "milkv";
   services.getty.autologinUser = "root";
 
-  services.udev.enable = false;
+  services.udev.enable = true;
   services.nscd.enable = false;
   nix.enable = true;
   system.nssModules = lib.mkForce [ ];
@@ -213,6 +213,8 @@ in
     hostName = "nixos-duo";
     firewall.enable = false;
   };
+
+  networking.wireless.enable = true;
 
   # configure usb0 as an RNDIS device
   systemd.tmpfiles.settings = {
@@ -244,7 +246,10 @@ in
 
   sdImage = {
     firmwareSize = 64;
-    populateRootCommands = "";
+    populateRootCommands = ''
+      mkdir -p ./rootImage/sys/firmware
+      cp -rv ${duo-buildroot-sdk}/device/milkv-duos-sd/overlay/mnt/system/firmware/aic8800 ./rootImage/sys/firmware/aic8800
+    '';
     populateFirmwareCommands = ''
       cp ${./prebuilt/fip-duos.bin}  firmware/fip.bin
       cp ${config.system.build.bootsd} firmware/boot.sd
