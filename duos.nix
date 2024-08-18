@@ -57,6 +57,8 @@ let
                   'KBUILD_AFLAGS += -march=$(riscv-march-aflags-y)_zicsr_zifencei'
     '';
   };
+
+  #batman-adv = pkgs.callPackage ./batmanadv.nix { kernel = kernel; };
 in
 {
 
@@ -66,7 +68,7 @@ in
 
   imports = [
     "${modulesPath}/installer/sd-card/sd-image.nix"
-    #./channel.nix
+    ./channel.nix
   ];
 
   nixpkgs = {
@@ -76,7 +78,7 @@ in
 
   boot.kernelPackages = pkgs.linuxPackagesFor kernel;
 
-  boot.extraModulePackages = [ ];
+  #boot.extraModulePackages = [ ];
 
   boot.kernelParams = [
     "console=ttyS0,115200"
@@ -191,7 +193,7 @@ in
 
   services.udev.enable = false;
   services.nscd.enable = false;
-  nix.enable = false;
+  nix.enable = true;
   system.nssModules = lib.mkForce [ ];
 
   networking = {
@@ -249,6 +251,6 @@ in
     '';
   };
 
-  swapDevices = [ { device = "/swap"; size = 2048; } ];
+  swapDevices = [ { device = "/swap"; size = 512; } ];
 
 }
