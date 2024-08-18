@@ -66,7 +66,7 @@ in
 
   imports = [
     "${modulesPath}/installer/sd-card/sd-image.nix"
-    ./channel.nix
+    #./channel.nix
   ];
 
   nixpkgs = {
@@ -189,9 +189,9 @@ in
   users.users.root.initialPassword = "milkv";
   services.getty.autologinUser = "root";
 
-  services.udev.enable = true;
+  services.udev.enable = false;
   services.nscd.enable = false;
-  nix.enable = true;
+  nix.enable = false;
   system.nssModules = lib.mkForce [ ];
 
   networking = {
