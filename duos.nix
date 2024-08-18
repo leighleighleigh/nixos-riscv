@@ -251,6 +251,6 @@ in
     '';
   };
 
-  swapDevices = [ { device = "/swap"; size = 512; } ];
+  #swapDevices = [ { device = "/swap"; size = 512; } ];
 
 }
