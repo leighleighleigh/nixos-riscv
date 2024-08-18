@@ -247,8 +247,8 @@ in
   sdImage = {
     firmwareSize = 64;
     populateRootCommands = ''
-      mkdir -p ./files/sys/firmware
-      cp -rv ${duo-buildroot-sdk}/device/milkv-duos-sd/overlay/mnt/system/firmware/aic8800 ./files/sys/firmware/aic8800
+      mkdir -p ./files/fwblobs/firmware
+      cp -rv ${duo-buildroot-sdk}/device/milkv-duos-sd/overlay/mnt/system/firmware/aic8800 ./files/fwblobs/firmware/aic8800
     '';
     populateFirmwareCommands = ''
       cp ${./prebuilt/fip-duos.bin}  firmware/fip.bin
